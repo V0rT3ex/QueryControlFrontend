@@ -1,4 +1,4 @@
-import QueryRange from "./queryRange.interface";
+import QueryRange from "./QueryRange.interface";
 
 export default interface StatisticsProps {
   dataSize: string;
