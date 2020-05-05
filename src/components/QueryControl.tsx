@@ -1,9 +1,10 @@
 import React, { Component } from "react";
 import axios from "axios";
 import QueryControlState from "../interfaces/QueryControlState.interface";
-import { stat } from "fs";
+import Statistics from "./Statistics";
+import Rank from "./Rank";
 
-const serverUrl = "http://localhost:8080/";
+const serverUrl = "http://localhost:5000/";
 
 class QueryControl extends Component<{}, QueryControlState> {
   state: QueryControlState;
@@ -64,11 +65,31 @@ class QueryControl extends Component<{}, QueryControlState> {
         errorMessage:
           "Could not make a request to the server. Please contact the maintaining team.",
       });
+      console.log(error);
       return;
     }
   };
 
   render() {
+    const { error, errorMessage, rank, statistics } = this.state;
+
+    let resultMarkup;
+
+    if (error) {
+      resultMarkup = <p>{errorMessage}</p>;
+    } else if (rank && statistics) {
+      resultMarkup = (
+        <div>
+          <Statistics
+            dataSize={statistics.dataSize}
+            numOfIndices={statistics.numOfIndices}
+            queryRange={statistics.queryRange}
+          />
+          <Rank queryScore={rank.queryScore} conditions={rank.conditions} />
+        </div>
+      );
+    }
+
     return (
       <div>
         <label>
@@ -84,6 +105,7 @@ class QueryControl extends Component<{}, QueryControlState> {
           <input type="text" ref={this.query} />
         </label>
         <button onClick={this.submit}>Submit</button>
+        {resultMarkup}
       </div>
     );
   }
