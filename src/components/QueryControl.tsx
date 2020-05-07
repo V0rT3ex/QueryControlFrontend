@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, SyntheticEvent } from "react";
 import axios from "axios";
 import QueryControlState from "../interfaces/QueryControlState.interface";
 import Statistics from "./Statistics";
@@ -30,6 +30,21 @@ class QueryControl extends Component<{}, QueryControlState> {
     this.environ = React.createRef();
     this.query = React.createRef();
   }
+
+  changeIndex = (e: React.FormEvent<HTMLInputElement>) => {
+    const index: string = e.currentTarget.value;
+    this.setState({ index: index });
+  };
+
+  changeEnviron = (e: React.FormEvent<HTMLInputElement>) => {
+    const environ: string = e.currentTarget.value;
+    this.setState({ environ: environ });
+  };
+
+  changeQuery = (e: React.FormEvent<HTMLInputElement>) => {
+    const query: string = e.currentTarget.value;
+    this.setState({ query: query });
+  };
 
   submit = async () => {
     const indexValue = this.index.current.value;
