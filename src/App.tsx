@@ -4,7 +4,7 @@ import QueryControl from "./components/QueryControl";
 class App extends Component {
   render() {
     return (
-      <div>
+      <div className="App">
         <QueryControl />
       </div>
     );

@@ -3,8 +3,7 @@ import axios from "axios";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import QueryControlState from "../interfaces/QueryControlState.interface";
-import Statistics from "./Statistics";
-import Rank from "./Rank";
+import Results from "./Results";
 
 const serverUrl = "http://localhost:5000/";
 
@@ -142,77 +141,60 @@ class QueryControl extends Component<{}, QueryControlState> {
 
   render() {
     const { indexError, environError, queryError, results } = this.state;
-
-    let resultMarkup;
-
-    if (results) {
-      const { error, errorMessage, statistics, rank } = results;
-      if (error) {
-        resultMarkup = <p>{errorMessage}</p>;
-      } else if (rank && statistics) {
-        resultMarkup = (
-          <div>
-            <Statistics
-              dataSize={statistics.dataSize}
-              numOfIndices={statistics.numOfIndices}
-              queryRange={statistics.queryRange}
-            />
-            <Rank queryScore={rank.queryScore} conditions={rank.conditions} />
-          </div>
-        );
-      }
-    }
-
     return (
-      <React.Fragment>
-        <div className="App">
-          <form>
-            <TextField
-              name="index"
-              value={this.state.index}
-              placeholder="Index"
-              label="Index"
-              multiline
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                this.changeIndex(e);
-              }}
-              error={indexError !== ""}
-              helperText={indexError !== "" ? indexError : ""}
-            />
-            <br />
-            <br />
-            <TextField
-              name="environ"
-              value={this.state.environ}
-              placeholder="Environ"
-              label="Environ"
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                this.changeEnviron(e);
-              }}
-              error={environError !== ""}
-              helperText={environError !== "" ? environError : ""}
-            />
-            <br />
-            <br />
-            <TextField
-              name="query"
-              value={this.state.query}
-              placeholder="Query"
-              label="Query"
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                this.changeQuery(e);
-              }}
-              error={queryError !== ""}
-              helperText={queryError !== "" ? queryError : ""}
-            />
-            <br />
-            <br />
-            <Button variant="contained" color="primary" onClick={this.submit}>
-              Send
-            </Button>
-          </form>
-        </div>
-      </React.Fragment>
+      <form>
+        <TextField
+          name="index"
+          value={this.state.index}
+          placeholder="Index"
+          label="Index"
+          multiline
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+            this.changeIndex(e);
+          }}
+          error={indexError !== ""}
+          helperText={indexError !== "" ? indexError : ""}
+        />
+        <br />
+        <br />
+        <TextField
+          name="environ"
+          value={this.state.environ}
+          placeholder="Environ"
+          label="Environ"
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+            this.changeEnviron(e);
+          }}
+          error={environError !== ""}
+          helperText={environError !== "" ? environError : ""}
+        />
+        <br />
+        <br />
+        <TextField
+          name="query"
+          value={this.state.query}
+          placeholder="Query"
+          label="Query"
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+            this.changeQuery(e);
+          }}
+          error={queryError !== ""}
+          helperText={queryError !== "" ? queryError : ""}
+        />
+        <br />
+        <br />
+        <Button variant="contained" color="primary" onClick={this.submit}>
+          Send
+        </Button>
+        {results && (
+          <Results
+            error={results.error}
+            errorMessage={results.errorMessage}
+            statistics={results.statistics}
+            rank={results.rank}
+          />
+        )}
+      </form>
     );
   }
 }
