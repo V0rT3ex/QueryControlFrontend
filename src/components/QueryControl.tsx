@@ -20,10 +20,7 @@ class QueryControl extends Component<{}, QueryControlState> {
       environError: "",
       query: "",
       queryError: "",
-      error: false,
-      errorMessage: "",
-      rank: null,
-      statistics: null,
+      results: null,
     };
   }
 
@@ -114,22 +111,29 @@ class QueryControl extends Component<{}, QueryControlState> {
       const queryData = queryRequest.data;
 
       this.setState({
-        error: false,
-        statistics: {
-          dataSize: statisticsData["data size"],
-          numOfIndices: statisticsData["number of indices"],
-          queryRange: statisticsData["longest time range"],
-        },
-        rank: {
-          queryScore: queryData["score"],
-          conditions: queryData["conditions"],
+        results: {
+          error: false,
+          errorMessage: "",
+          statistics: {
+            dataSize: statisticsData["data size"],
+            numOfIndices: statisticsData["number of indices"],
+            queryRange: statisticsData["longest time range"],
+          },
+          rank: {
+            queryScore: queryData["score"],
+            conditions: queryData["conditions"],
+          },
         },
       });
     } catch (error) {
       this.setState({
-        error: true,
-        errorMessage:
-          "Could not make a request to the server. Please contact the maintaining team.",
+        results: {
+          error: true,
+          errorMessage:
+            "Could not make a request to the server. Please contact the maintaining team.",
+          statistics: null,
+          rank: null,
+        },
       });
       console.log(error);
       return;
@@ -137,31 +141,26 @@ class QueryControl extends Component<{}, QueryControlState> {
   };
 
   render() {
-    const {
-      error,
-      errorMessage,
-      rank,
-      statistics,
-      indexError,
-      environError,
-      queryError,
-    } = this.state;
+    const { indexError, environError, queryError, results } = this.state;
 
     let resultMarkup;
 
-    if (error) {
-      resultMarkup = <p>{errorMessage}</p>;
-    } else if (rank && statistics) {
-      resultMarkup = (
-        <div>
-          <Statistics
-            dataSize={statistics.dataSize}
-            numOfIndices={statistics.numOfIndices}
-            queryRange={statistics.queryRange}
-          />
-          <Rank queryScore={rank.queryScore} conditions={rank.conditions} />
-        </div>
-      );
+    if (results) {
+      const { error, errorMessage, statistics, rank } = results;
+      if (error) {
+        resultMarkup = <p>{errorMessage}</p>;
+      } else if (rank && statistics) {
+        resultMarkup = (
+          <div>
+            <Statistics
+              dataSize={statistics.dataSize}
+              numOfIndices={statistics.numOfIndices}
+              queryRange={statistics.queryRange}
+            />
+            <Rank queryScore={rank.queryScore} conditions={rank.conditions} />
+          </div>
+        );
+      }
     }
 
     return (

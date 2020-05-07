@@ -1,5 +1,4 @@
-import RankProps from "./RankProps.interface";
-import StatisticsProps from "./StatisticsProps.interface";
+import ResultsProps from "./ResultsProps.interface";
 
 export default interface QueryControlState {
   index: string;
@@ -8,8 +7,5 @@ export default interface QueryControlState {
   environError: string;
   query: string;
   queryError: string;
-  error: boolean;
-  errorMessage: string;
-  rank: RankProps;
-  statistics: StatisticsProps;
+  results: ResultsProps;
 }
