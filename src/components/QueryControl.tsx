@@ -15,6 +15,12 @@ class QueryControl extends Component<{}, QueryControlState> {
   constructor(props: {}) {
     super(props);
     this.state = {
+      index: "",
+      indexError: "",
+      environ: "",
+      environError: "",
+      query: "",
+      queryError: "",
       error: false,
       errorMessage: "",
       rank: null,
