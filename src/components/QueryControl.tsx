@@ -1,5 +1,7 @@
-import React, { Component, SyntheticEvent } from "react";
+import React, { Component, ChangeEvent } from "react";
 import axios from "axios";
+import TextField from "@material-ui/core/TextField";
+import Button from "@material-ui/core/Button";
 import QueryControlState from "../interfaces/QueryControlState.interface";
 import Statistics from "./Statistics";
 import Rank from "./Rank";
@@ -8,9 +10,6 @@ const serverUrl = "http://localhost:5000/";
 
 class QueryControl extends Component<{}, QueryControlState> {
   state: QueryControlState;
-  index: React.RefObject<HTMLInputElement>;
-  environ: React.RefObject<HTMLInputElement>;
-  query: React.RefObject<HTMLInputElement>;
 
   constructor(props: {}) {
     super(props);
@@ -26,34 +25,80 @@ class QueryControl extends Component<{}, QueryControlState> {
       rank: null,
       statistics: null,
     };
-    this.index = React.createRef();
-    this.environ = React.createRef();
-    this.query = React.createRef();
   }
 
-  changeIndex = (e: React.FormEvent<HTMLInputElement>) => {
+  private changeIndex = (e: React.FormEvent<HTMLInputElement>) => {
     const index: string = e.currentTarget.value;
-    this.setState({ index: index });
+    this.setState({ index: index }, () => {
+      this.validateIndex();
+    });
   };
 
-  changeEnviron = (e: React.FormEvent<HTMLInputElement>) => {
+  private validateIndex = () => {
+    const { index } = this.state;
+    if (index.length < 5) {
+      this.setState({
+        indexError: "index field must contain at least 5 characters",
+      });
+      return false;
+    } else {
+      this.setState({
+        indexError: "",
+      });
+      return true;
+    }
+  };
+
+  private changeEnviron = (e: React.FormEvent<HTMLInputElement>) => {
     const environ: string = e.currentTarget.value;
-    this.setState({ environ: environ });
+    this.setState({ environ: environ }, () => {
+      this.validateEnviron();
+    });
   };
 
-  changeQuery = (e: React.FormEvent<HTMLInputElement>) => {
+  private validateEnviron = () => {
+    const { environ } = this.state;
+    if (!environ || environ.includes(" ")) {
+      this.setState({
+        environError: "Environment is only one word!",
+      });
+      return false;
+    } else {
+      this.setState({
+        environError: "",
+      });
+      return true;
+    }
+  };
+
+  private changeQuery = (e: React.FormEvent<HTMLInputElement>) => {
     const query: string = e.currentTarget.value;
-    this.setState({ query: query });
+    this.setState({ query: query }, () => {
+      this.validateQuery();
+    });
   };
 
-  submit = async () => {
-    const indexValue = this.index.current.value;
-    const environValue = this.environ.current.value;
-    const queryValue = this.query.current.value;
+  private validateQuery = () => {
+    const { query } = this.state;
+    if (!query.endsWith("}") || !query.startsWith("{")) {
+      this.setState({
+        queryError: "Query must start and end with { }",
+      });
+      return false;
+    } else {
+      this.setState({
+        queryError: "",
+      });
+      return true;
+    }
+  };
+
+  private submit = async () => {
+    const { index, environ, query } = this.state;
     const requestdata = {
-      index: indexValue,
-      env: environValue,
-      query: queryValue,
+      index: index,
+      env: environ,
+      query: query,
     };
 
     try {
@@ -92,7 +137,15 @@ class QueryControl extends Component<{}, QueryControlState> {
   };
 
   render() {
-    const { error, errorMessage, rank, statistics } = this.state;
+    const {
+      error,
+      errorMessage,
+      rank,
+      statistics,
+      indexError,
+      environError,
+      queryError,
+    } = this.state;
 
     let resultMarkup;
 
@@ -112,22 +165,55 @@ class QueryControl extends Component<{}, QueryControlState> {
     }
 
     return (
-      <div>
-        <label>
-          Index:
-          <input type="text" ref={this.index} />
-        </label>
-        <label>
-          Environment:
-          <input type="text" ref={this.environ} />
-        </label>
-        <label>
-          Query:
-          <input type="text" ref={this.query} />
-        </label>
-        <button onClick={this.submit}>Submit</button>
-        {resultMarkup}
-      </div>
+      <React.Fragment>
+        <div className="App">
+          <form>
+            <TextField
+              name="index"
+              value={this.state.index}
+              placeholder="Index"
+              label="Index"
+              multiline
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                this.changeIndex(e);
+              }}
+              error={indexError !== ""}
+              helperText={indexError !== "" ? indexError : ""}
+            />
+            <br />
+            <br />
+            <TextField
+              name="environ"
+              value={this.state.environ}
+              placeholder="Environ"
+              label="Environ"
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                this.changeEnviron(e);
+              }}
+              error={environError !== ""}
+              helperText={environError !== "" ? environError : ""}
+            />
+            <br />
+            <br />
+            <TextField
+              name="query"
+              value={this.state.query}
+              placeholder="Query"
+              label="Query"
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                this.changeQuery(e);
+              }}
+              error={queryError !== ""}
+              helperText={queryError !== "" ? queryError : ""}
+            />
+            <br />
+            <br />
+            <Button variant="contained" color="primary" onClick={this.submit}>
+              Send
+            </Button>
+          </form>
+        </div>
+      </React.Fragment>
     );
   }
 }
